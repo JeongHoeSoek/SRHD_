@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ui.notifications.NotificationsFragment">
+
+
+
+    <RelativeLayout
+        android:id="@+id/selection"
+        android:layout_width="360dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:clipToOutline="true"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <TextView
+            android:id="@+id/title"
+            android:layout_width="336dp"
+            android:layout_height="20dp"
+            android:text="알람 시간"
+            android:textColor="@color/black"
+            android:lineSpacingExtra="4sp"
+            android:translationY="-1.8sp"
+            android:gravity="top" />
+
+        <RadioGroup
+            android:id="@+id/radioGroup"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/title"
+            android:layout_marginTop="8dp"
+            android:orientation="horizontal">
+
+            <ToggleButton
+                android:id="@+id/toggleButton_10_sec"
+                android:layout_width="80dp"
+                android:layout_height="wrap_content"
+                android:text="10초"
+                android:textOff="10초"
+                android:textOn="10초"
+                android:layout_marginEnd="8dp"
+                android:background="@drawable/alarm_chip"
+                android:layout_below="@id/title" />
+
+            <ToggleButton
+                android:id="@+id/toggleButton_30_sec"
+                android:layout_width="80dp"
+                android:layout_height="wrap_content"
+                android:text="30초"
+                android:textOff="30초"
+                android:textOn="30초"
+                android:layout_marginEnd="8dp"
+                android:background="@drawable/alarm_chip" />
+
+            <ToggleButton
+                android:id="@+id/toggleButton_1_min"
+                android:layout_width="80dp"
+                android:layout_height="wrap_content"
+                android:text="1분"
+                android:textOff="1분"
+                android:textOn="1분"
+                android:layout_marginEnd="8dp"
+                android:background="@drawable/alarm_chip" />
+
+            <ToggleButton
+                android:id="@+id/toggleButton_3_min"
+                android:layout_width="80dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:background="@drawable/alarm_chip"
+                android:text="3분"
+                android:textOff="3분"
+                android:textOn="3분" />
+        </RadioGroup>
+
+    </RelativeLayout>
+
+
+    <RelativeLayout
+        android:id="@+id/selection2"
+        android:layout_width="360dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="60dp"
+        android:clipToOutline="true"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/selection">
+
+        <TextView
+            android:id="@+id/title2"
+            android:layout_width="336dp"
+            android:layout_height="20dp"
+            android:text="알람 세기"
+            android:textColor="@color/black"
+            android:lineSpacingExtra="4sp"
+            android:translationY="-1.8sp"
+            android:gravity="top" />
+
+        <RadioGroup
+            android:id="@+id/radioGroup2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/title2"
+            android:layout_marginTop="8dp"
+            android:orientation="horizontal">
+
+            <ToggleButton
+                android:id="@+id/toggleButton_low"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:text="낮음"
+                android:textOff="낮음"
+                android:textOn="낮음"
+                android:background="@drawable/alarm_chip" />
+
+            <ToggleButton
+                android:id="@+id/toggleButton_medium"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:text="보통"
+                android:textOff="보통"
+                android:textOn="보통"
+                android:background="@drawable/alarm_chip" />
+
+            <ToggleButton
+                android:id="@+id/toggleButton_high"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:text="높음"
+                android:textOff="높음"
+                android:textOn="높음"
+                android:background="@drawable/alarm_chip" />
+        </RadioGroup>
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/selection3"
+        android:layout_width="360dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="60dp"
+        android:clipToOutline="true"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/selection2">
+
+        <TextView
+            android:id="@+id/title3"
+            android:layout_width="336dp"
+            android:layout_height="20dp"
+            android:text="알람 종류"
+            android:textColor="@color/black"
+            android:lineSpacingExtra="4sp"
+            android:translationY="-1.8sp"
+            android:gravity="top" />
+
+        <RadioGroup
+            android:id="@+id/radioGroup3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/title3"
+            android:layout_marginTop="8dp"
+            android:orientation="horizontal">
+
+            <ToggleButton
+                android:id="@+id/toggleButton_vibration"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:text="진동"
+                android:textOff="진동"
+                android:textOn="진동"
+                android:background="@drawable/alarm_long_chip" />
+
+            <ToggleButton
+                android:id="@+id/toggleButton_sound"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:text="소리"
+                android:textOff="소리"
+                android:textOn="소리"
+                android:background="@drawable/alarm_long_chip" />
+        </RadioGroup>
+    </RelativeLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

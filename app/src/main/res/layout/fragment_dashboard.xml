@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
+
+
+    <RelativeLayout
+        android:id="@+id/message_"
+        android:layout_width="300dp"
+        android:layout_height="300dp"
+        android:layout_marginTop="0dp"
+        android:background="@drawable/message_"
+        android:clipToOutline="true"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <EditText
+            android:id="@+id/message_text"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_margin="5dp"
+            android:layout_marginStart="5dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginEnd="5dp"
+            android:layout_marginBottom="5dp"
+            android:gravity="top"
+            android:hint="내용을 입력해주세요"
+            android:inputType="textMultiLine"
+            android:maxLines="10"
+            android:scrollbarStyle="insideOverlay"
+            android:scrollbars="vertical"
+            android:translationY="-1.07sp" />
+
+    </RelativeLayout>
+
+
+    <TextView
+        android:id="@+id/sms_text2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="알람이 끝난 후 저장된 \n전화번호로 위치 정보와 함께\n 위험 메시지가 일괄 전송됩니다."
+        android:textSize="18dp"
+        android:layout_marginTop="30dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/message_"
+        tools:layout_editor_absoluteX="176dp" />
+
+
+    <Button
+        android:id="@+id/primary_button"
+        android:layout_width="336dp"
+        android:layout_height="60dp"
+        android:layout_marginTop="12dp"
+        android:background="@drawable/primary"
+        android:text="저장"
+        android:textSize="24dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.493"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/sms_text2" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

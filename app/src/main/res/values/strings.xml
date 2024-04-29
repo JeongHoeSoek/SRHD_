@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">SRHD</string>
+    <string name="title_main">MAIN</string>
+    <string name="title_phone">비상연락망</string>
+    <string name="title_sms">SMS 내용</string>
+    <string name="title_notifications">알람</string>
+</resources>
