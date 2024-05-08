@@ -4,4 +4,7 @@
     <string name="title_phone">비상연락망</string>
     <string name="title_sms">SMS 내용</string>
     <string name="title_notifications">알람</string>
+    <string name="notification_channel_id">my_channel_01</string>
+    <string name="channel_name">SRHD</string>
+    <string name="channel_description">SRHD 애플리케이션 실행 중...</string>
 </resources>

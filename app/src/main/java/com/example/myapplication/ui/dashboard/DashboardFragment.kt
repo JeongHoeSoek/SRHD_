@@ -30,10 +30,8 @@ class DashboardFragment : Fragment() {
 
         binding.primaryButton.setOnClickListener {
             val newMessage = binding.messageText.text.toString().trim()
-            if (newMessage.isNotEmpty()) {
-                viewModel.saveMessage(newMessage)
-                Toast.makeText(requireContext(), "저장되었습니다.", Toast.LENGTH_SHORT).show()
-            }
+            viewModel.saveMessage(newMessage)
+            Toast.makeText(requireContext(), "저장되었습니다.", Toast.LENGTH_SHORT).show()
         }
     }
 
