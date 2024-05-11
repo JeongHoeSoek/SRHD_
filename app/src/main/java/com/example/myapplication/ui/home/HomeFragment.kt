@@ -10,9 +10,12 @@ import android.app.AlarmManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.widget.Toast
 import com.cookandroid.myapplication.AlarmReceiver
 import com.cookandroid.myapplication.R
 import com.cookandroid.myapplication.databinding.FragmentHomeBinding
+import com.gun0912.tedpermission.PermissionListener
+import com.gun0912.tedpermission.normal.TedPermission
 
 class HomeFragment : Fragment() {
 
@@ -20,7 +23,7 @@ class HomeFragment : Fragment() {
     private val binding get() = _binding!!
 
     private val homeViewModel: HomeViewModel by viewModels()
-    private fun setAlarm() {
+    /*private fun setAlarm() {
         // 권한 상태를 확인하고 필요한 경우 권한을 요청하는 로직
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
             val alarmManager = context?.getSystemService(Context.ALARM_SERVICE) as AlarmManager
@@ -46,7 +49,34 @@ class HomeFragment : Fragment() {
             val alarmTimeAtUTC = System.currentTimeMillis() + 30 * 1000 // 30초 후
             alarmManager.setExact(AlarmManager.RTC_WAKEUP, alarmTimeAtUTC, pendingIntent)
         }
-    }
+
+
+    }*/
+
+    /*private fun requestPermission() {
+        TedPermission.create()
+            .setPermissionListener(object : PermissionListener {
+                override fun onPermissionGranted() {
+                    startProcess()
+                }
+
+                override fun onPermissionDenied(deniedPermissions: MutableList<String>?) {
+                    Toast.makeText(this@HomeFragment.requireActivity(), "카메라 기능 실행", Toast.LENGTH_SHORT).show()
+                }
+            })
+            .setDeniedMessage("권한을 허용해주세요.")// 권한이 없을 때 띄워주는 Dialog Message
+            .setPermissions(android.Manifest.permission.SCHEDULE_EXACT_ALARM)// 얻으려는 권한(여러개 가능)
+            .check()
+    }*/
+
+    /* private fun startProcess() {
+        val alarmManager = context?.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+        val intent = Intent(context, AlarmReceiver::class.java)
+        val pendingIntent = PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
+
+        val alarmTimeAtUTC = System.currentTimeMillis() + 1 * 1000 // 30초 후
+        alarmManager.setExact(AlarmManager.RTC_WAKEUP, alarmTimeAtUTC, pendingIntent)
+    }*/
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -75,7 +105,7 @@ class HomeFragment : Fragment() {
             // 앱 기능 ON 시 코드
             binding.imageView.setImageResource(R.drawable.main_icon_on)
             binding.buttonToggle.setImageResource(R.drawable.main_on_button)
-            setAlarm() // 알람 설정
+            //setAlarm() // 알람 설정
         } else {
             // 앱 기능 OFF 시 코드
             binding.imageView.setImageResource(R.drawable.main_icon_off)

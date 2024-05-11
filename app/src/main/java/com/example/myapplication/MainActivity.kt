@@ -6,6 +6,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
+import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
@@ -15,6 +16,8 @@ import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.cookandroid.myapplication.databinding.ActivityMainBinding
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.gun0912.tedpermission.PermissionListener
+import com.gun0912.tedpermission.normal.TedPermission
 
 class MainActivity : AppCompatActivity() {
 
@@ -35,12 +38,35 @@ class MainActivity : AppCompatActivity() {
         navView.setupWithNavController(navController)
 
         //createNotificationChannel()
+        requestPermission()
+        //val startIntent = Intent(this, MyForegroundService::class.java)
+        //ContextCompat.startForegroundService(this, startIntent)
+    }
 
+    private fun requestPermission() {
+        TedPermission.create()
+            .setPermissionListener(object : PermissionListener {
+
+                //권한이 허용됐을 때
+                override fun onPermissionGranted() {
+                    startProcess()
+                }
+
+                //권한이 거부됐을 때
+                override fun onPermissionDenied(deniedPermissions: MutableList<String>?) {
+                    Toast.makeText(this@MainActivity, "알림 권한이 거부됨.", Toast.LENGTH_SHORT).show()
+                }
+            })
+            .setDeniedMessage("알림 권한을 허용해주세요.")// 권한이 없을 때 띄워주는 Dialog Message
+            .setPermissions(android.Manifest.permission.POST_NOTIFICATIONS)// 얻으려는 권한(여러개 가능)
+            .check()
+    }
+
+    private fun startProcess() {
         val startIntent = Intent(this, MyForegroundService::class.java)
         ContextCompat.startForegroundService(this, startIntent)
     }
-
-    private fun createNotificationChannel() {
+    /*private fun createNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val name = getString(R.string.channel_name) // 알림 채널의 이름
             val importance = NotificationManager.IMPORTANCE_HIGH
@@ -48,5 +74,5 @@ class MainActivity : AppCompatActivity() {
             val notificationManager = getSystemService(NotificationManager::class.java)
             notificationManager.createNotificationChannel(channel)
         }
-    }
+    }*/
 }
