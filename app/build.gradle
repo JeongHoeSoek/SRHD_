@@ -48,6 +48,10 @@ dependencies {
     implementation 'androidx.lifecycle:lifecycle-service:2.7.0'
     // TedPermission 추가(권한관리)
     implementation 'io.github.ParkSangGwon:tedpermission-normal:3.3.0'
+    // SSH 서버 연결
+    implementation 'com.jcraft:jsch:0.1.55'
+    // Kotlin 코루틴 사용
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.1'
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
