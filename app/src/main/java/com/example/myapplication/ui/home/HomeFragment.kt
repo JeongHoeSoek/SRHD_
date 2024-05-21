@@ -98,11 +98,19 @@ class HomeFragment : Fragment() {
 
     private fun updateButtonState(isImageOn: Boolean) {
         Log.d("버튼 업데이트", isImageOn.toString())
+        val sharedPref = context?.getSharedPreferences("AppSettings", Context.MODE_PRIVATE)
         if (isImageOn) {
             // 앱 기능 ON 시 코드
             binding.imageView.setImageResource(R.drawable.main_icon_on)
             binding.buttonToggle.setImageResource(R.drawable.main_on_button)
-            setAlarm() // 알람 설정
+
+            val isAlarmRunning = sharedPref?.getBoolean("isAlarmRunning", false)
+            if (!isAlarmRunning!!) {
+                setAlarm() // 알람 설정
+            } else {
+                Log.d("HomeFragment", "Alarm is already running")
+            }
+
         } else {
             // 앱 기능 OFF 시 코드
             binding.imageView.setImageResource(R.drawable.main_icon_off)
@@ -123,6 +131,14 @@ class HomeFragment : Fragment() {
         CoroutineScope(Dispatchers.IO).launch {
             SSHManager.writeToServer("0")
         }
+        stopAlarm(context!!)
+    }
+
+    private fun stopAlarm(context: Context) {
+        val intent = Intent(context, AlarmReceiver::class.java)
+        intent.action = "STOP_ALARM"
+        context.sendBroadcast(intent)
+        Log.d("HomeFragment StopAlarm", intent.action.toString())
     }
 
     override fun onResume() {
