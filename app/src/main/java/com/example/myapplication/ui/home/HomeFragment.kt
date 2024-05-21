@@ -8,6 +8,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import android.app.AlarmManager
 import android.app.PendingIntent
+import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.widget.Toast
@@ -16,11 +17,18 @@ import com.cookandroid.myapplication.R
 import com.cookandroid.myapplication.databinding.FragmentHomeBinding
 import com.gun0912.tedpermission.PermissionListener
 import com.gun0912.tedpermission.normal.TedPermission
+import android.content.IntentFilter
+import android.util.Log
+import com.cookandroid.myapplication.SSHManager
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class HomeFragment : Fragment() {
 
     private var _binding: FragmentHomeBinding? = null
     private val binding get() = _binding!!
+    //private var serviceScope: CoroutineScope? = null
 
     private val homeViewModel: HomeViewModel by viewModels()
     private fun setAlarm() {
@@ -57,6 +65,15 @@ class HomeFragment : Fragment() {
         alarmManager.setExact(AlarmManager.RTC_WAKEUP, alarmTimeAtUTC, pendingIntent)
     }*/
 
+    private val updateStateReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+            intent?.getBooleanExtra("state", false)?.let { state ->
+                Log.d("HomeFragment", "Broadcast received with state: $state")
+                homeViewModel.setImageOnState(state)
+            }
+        }
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -80,6 +97,7 @@ class HomeFragment : Fragment() {
     }
 
     private fun updateButtonState(isImageOn: Boolean) {
+        Log.d("버튼 업데이트", isImageOn.toString())
         if (isImageOn) {
             // 앱 기능 ON 시 코드
             binding.imageView.setImageResource(R.drawable.main_icon_on)
@@ -102,8 +120,24 @@ class HomeFragment : Fragment() {
             alarmManager.cancel(pendingIntent)
             pendingIntent.cancel()
         }
+        CoroutineScope(Dispatchers.IO).launch {
+            SSHManager.writeToServer("0")
+        }
     }
 
+    override fun onResume() {
+        super.onResume()
+
+        context?.registerReceiver(updateStateReceiver, IntentFilter("com.cookandroid.myapplication.ACTION_UPDATE_STATE"))
+        // 상태를 다시 로드하여 UI를 업데이트
+        homeViewModel.setImageOnState(homeViewModel.loadImageOnState())
+        //Log.d("백그라운드에서 복귀", homeViewModel.loadImageOnState().toString())
+    }
+
+    override fun onPause() {
+        super.onPause()
+        context?.unregisterReceiver(updateStateReceiver)
+    }
 
     override fun onDestroyView() {
         super.onDestroyView()

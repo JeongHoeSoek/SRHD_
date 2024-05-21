@@ -55,7 +55,38 @@ class MyForegroundService : Service() {
         }
         data?.let {
             Log.d("Service", "Received new data from server: $it")
+            if (it.trim() == "1") {
+                // 브로드캐스트를 통해 HomeViewModel의 상태를 변경합니다.
+                //val intent = Intent("com.cookandroid.myapplication.ACTION_UPDATE_STATE")
+
+                //intent.putExtra("state", true)
+                //Log.d("값 변경", intent.getBooleanExtra("state", false).toString())
+                //sendBroadcast(intent)
+                updateState(true)
+                // 알람을 설정합니다.
+                setAlarm()
+            }
         }
+    }
+    private fun updateState(state: Boolean) {
+        // 상태를 SharedPreferences에 저장합니다.
+        val sharedPref = getSharedPreferences("AppPreferences", Context.MODE_PRIVATE)
+        with(sharedPref.edit()) {
+            putBoolean("IS_IMAGE_ON", state)
+            apply()
+        }
+
+        val intent = Intent("com.cookandroid.myapplication.ACTION_UPDATE_STATE")
+        intent.putExtra("state", state)
+        sendBroadcast(intent)
+    }
+
+    private fun setAlarm() {
+        val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
+        val intent = Intent(this, AlarmReceiver::class.java)
+        val pendingIntent = PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
+        val alarmTimeAtUTC = System.currentTimeMillis() + 5 * 1000 // 5초 후
+        alarmManager.setExact(AlarmManager.RTC_WAKEUP, alarmTimeAtUTC, pendingIntent)
     }
 
     private fun runBackground() {

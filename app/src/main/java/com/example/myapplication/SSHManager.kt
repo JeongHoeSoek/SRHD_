@@ -54,6 +54,35 @@ object SSHManager {
         }
     }
 
+    suspend fun writeToServer(value: String) = withContext(Dispatchers.IO) {
+        var channel: ChannelExec? = null
+        try {
+            if (session?.isConnected == true) {
+                closeSession() // Ensure previous session is closed
+            }
+
+            val jsch = JSch()
+            session = jsch.getSession("chaenoa", "withcap.iptime.org", 22).apply {
+                setPassword("Ca123oa!")
+                setConfig("StrictHostKeyChecking", "no")
+                connect()
+            }
+
+            channel = session!!.openChannel("exec") as ChannelExec
+            channel.setCommand("echo \"$value\" > test")
+            channel.connect()
+
+            while (!channel.isClosed) {
+                Thread.sleep(100)
+            }
+        } catch (e: Exception) {
+            Log.e("SSH Error", "Error during SSH connection: ${e.message}")
+        } finally {
+            closeChannel(channel)
+            closeSession()
+        }
+    }
+
     private fun closeChannel(channel: ChannelExec?) {
         if (channel != null) {
             Log.d("closeChannel", "채널 닫기")
@@ -61,7 +90,7 @@ object SSHManager {
         }
     }
 
-    fun closeSession() {
+    private fun closeSession() {
         session?.let {
             if (it.isConnected) {
                 Log.d("closeSession", "session 닫기")

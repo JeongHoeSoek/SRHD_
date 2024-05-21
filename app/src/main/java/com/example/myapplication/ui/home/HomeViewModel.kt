@@ -20,6 +20,11 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         saveImageOnState(newState)
     }
 
+    fun setImageOnState(isOn: Boolean) {
+        _isImageOn.postValue(isOn)
+        saveImageOnState(isOn)
+    }
+
     private fun saveImageOnState(isOn: Boolean) {
         val sharedPref = getApplication<Application>().getSharedPreferences("AppPreferences", Context.MODE_PRIVATE)
         with(sharedPref.edit()) {
@@ -28,7 +33,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    private fun loadImageOnState(): Boolean {
+    fun loadImageOnState(): Boolean {
         val sharedPref = getApplication<Application>().getSharedPreferences("AppPreferences", Context.MODE_PRIVATE)
         return sharedPref.getBoolean("IS_IMAGE_ON", false)
     }
