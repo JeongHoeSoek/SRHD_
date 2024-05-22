@@ -1,11 +1,13 @@
 package com.cookandroid.myapplication
 
-import android.app.NotificationChannel
-import android.app.NotificationManager
+import android.Manifest.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.provider.Settings
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
@@ -18,6 +20,7 @@ import com.cookandroid.myapplication.databinding.ActivityMainBinding
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.gun0912.tedpermission.PermissionListener
 import com.gun0912.tedpermission.normal.TedPermission
+
 
 class MainActivity : AppCompatActivity() {
 
@@ -39,8 +42,30 @@ class MainActivity : AppCompatActivity() {
 
         //createNotificationChannel()
         requestPermission()
+        // 배터리 최적화 예외를 요청합니다.
+        if (!isIgnoringBatteryOptimizations(this)) {
+            requestIgnoreBatteryOptimization()
+        }
+        //requestBatteryPermission()
         //val startIntent = Intent(this, MyForegroundService::class.java)
         //ContextCompat.startForegroundService(this, startIntent)
+    }
+
+    private fun isIgnoringBatteryOptimizations(context: Context): Boolean {
+        val powerManager = context.getSystemService(Context.POWER_SERVICE) as android.os.PowerManager
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            powerManager.isIgnoringBatteryOptimizations(context.packageName)
+        } else {
+            true
+        }
+    }
+
+    private fun requestIgnoreBatteryOptimization() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            val intent = Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS)
+            intent.data = Uri.parse("package:$packageName")
+            startActivity(intent)
+        }
     }
 
     private fun requestPermission() {
@@ -61,6 +86,25 @@ class MainActivity : AppCompatActivity() {
             .setPermissions(android.Manifest.permission.POST_NOTIFICATIONS)// 얻으려는 권한(여러개 가능)
             .check()
     }
+
+    /*private fun requestBatteryPermission() {
+        TedPermission.create()
+            .setPermissionListener(object : PermissionListener {
+
+                //권한이 허용됐을 때
+                override fun onPermissionGranted() {
+                    //startProcess()
+                }
+
+                //권한이 거부됐을 때
+                override fun onPermissionDenied(deniedPermissions: MutableList<String>?) {
+                    Toast.makeText(this@MainActivity, "배터리 최적화 해제 거부됨.", Toast.LENGTH_SHORT).show()
+                }
+            })
+            .setDeniedMessage("배터리 최적화 목록 제외를 이행해주세요.")// 권한이 없을 때 띄워주는 Dialog Message
+            .setPermissions(android.Manifest.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS)// 얻으려는 권한(여러개 가능)
+            .check()
+    }*/
 
     private fun startProcess() {
         val startIntent = Intent(this, MyForegroundService::class.java)
