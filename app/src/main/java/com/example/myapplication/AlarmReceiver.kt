@@ -1,8 +1,11 @@
 package com.cookandroid.myapplication
 
+import android.app.Application
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.database.sqlite.SQLiteDatabase
+import android.database.sqlite.SQLiteOpenHelper
 import android.media.AudioAttributes
 import android.media.AudioManager
 import android.media.Ringtone
@@ -11,9 +14,14 @@ import android.net.Uri
 import android.os.Handler
 import android.os.Looper
 import android.os.Vibrator
+import android.telephony.SmsManager
 import android.util.Log
 import android.widget.Toast
+import com.cookandroid.myapplication.ui.dashboard.DashboardViewModel.DBHelper as MessageDBHelper
+import com.cookandroid.myapplication.ui.phone.PhoneViewModel
+import com.cookandroid.myapplication.ui.dashboard.DashboardViewModel
 import com.cookandroid.myapplication.ui.home.HomeFragment
+//import com.cookandroid.myapplication.ui.phone.PhoneViewModel
 
 class AlarmReceiver : BroadcastReceiver() {
 
@@ -151,6 +159,65 @@ class AlarmReceiver : BroadcastReceiver() {
             putBoolean("isAlarmRunning", false)
             apply()
         }
+
+        // SMS 전송
+        sendSMS(context)
         Log.d("AlarmReceiver", "Alarm stopped")
+    }
+
+    private fun sendSMS(context: Context) {
+        val smsManager = SmsManager.getDefault()
+
+        // 메시지 내용 가져오기
+        val message = getMessageFromDatabase(context) ?: return
+
+        // 전화번호 목록 가져오기
+        val phoneNumbers = getPhoneNumbersFromDatabase(context) ?: return
+
+        Log.d("AlarmReceiver", "sendSMS")
+        // SMS 전송
+        phoneNumbers.forEach { phoneNumber ->
+            smsManager.sendTextMessage(phoneNumber, null, message, null, null)
+            Log.d("AlarmReceiver", "SMS sent to $phoneNumber: $message")
+        }
+    }
+
+    private fun getMessageFromDatabase(context: Context): String? {
+        val dbHelper = MessageDBHelper(context)
+        val db = dbHelper.readableDatabase
+        val cursor = db.query(MessageDBHelper.TABLE_MESSAGES, arrayOf(MessageDBHelper.KEY_MESSAGE), null, null, null, null, null)
+        var message: String? = null
+        if (cursor.moveToFirst()) {
+            message = cursor.getString(cursor.getColumnIndexOrThrow(MessageDBHelper.KEY_MESSAGE))
+        }
+        cursor.close()
+        dbHelper.close()
+        return message
+    }
+
+    private fun getPhoneNumbersFromDatabase(context: Context): List<String>? {
+        val dbHelper = object : SQLiteOpenHelper(context, PhoneViewModel.DATABASE_NAME, null, PhoneViewModel.DATABASE_VERSION) {
+            override fun onCreate(db: SQLiteDatabase) {
+                db.execSQL(PhoneViewModel.SQL_CREATE_ENTRIES)
+            }
+
+            override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
+                db.execSQL(PhoneViewModel.SQL_DELETE_ENTRIES)
+                onCreate(db)
+            }
+        }
+
+        val db = dbHelper.readableDatabase
+        val cursor = db.query(PhoneViewModel.TABLE_NAME, arrayOf(PhoneViewModel.COLUMN_NAME_PHONE), null, null, null, null, null)
+        val phoneNumbers = mutableListOf<String>()
+        with(cursor) {
+            while (moveToNext()) {
+                val phone = getString(getColumnIndexOrThrow(PhoneViewModel.COLUMN_NAME_PHONE))
+                phoneNumbers.add(phone)
+            }
+        }
+        cursor.close()
+        dbHelper.close()
+        return phoneNumbers
     }
 }

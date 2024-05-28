@@ -42,6 +42,8 @@ class MainActivity : AppCompatActivity() {
 
         //createNotificationChannel()
         requestPermission()
+
+        requestSMSPermission()
         // 배터리 최적화 예외를 요청합니다.
         if (!isIgnoringBatteryOptimizations(this)) {
             requestIgnoreBatteryOptimization()
@@ -84,6 +86,25 @@ class MainActivity : AppCompatActivity() {
             })
             .setDeniedMessage("알림 권한을 허용해주세요.")// 권한이 없을 때 띄워주는 Dialog Message
             .setPermissions(android.Manifest.permission.POST_NOTIFICATIONS)// 얻으려는 권한(여러개 가능)
+            .check()
+    }
+
+    private fun requestSMSPermission() {
+        TedPermission.create()
+            .setPermissionListener(object : PermissionListener {
+
+                //권한이 허용됐을 때
+                override fun onPermissionGranted() {
+                    //startProcess()
+                }
+
+                //권한이 거부됐을 때
+                override fun onPermissionDenied(deniedPermissions: MutableList<String>?) {
+                    Toast.makeText(this@MainActivity, "알림 권한이 거부됨.", Toast.LENGTH_SHORT).show()
+                }
+            })
+            .setDeniedMessage("SMS 권한을 허용해주세요.")// 권한이 없을 때 띄워주는 Dialog Message
+            .setPermissions(android.Manifest.permission.SEND_SMS)// 얻으려는 권한(여러개 가능)
             .check()
     }
 
