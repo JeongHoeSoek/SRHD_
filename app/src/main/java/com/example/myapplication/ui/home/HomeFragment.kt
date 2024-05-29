@@ -1,5 +1,6 @@
 package com.cookandroid.myapplication.ui.home
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -10,6 +11,8 @@ import android.app.AlarmManager
 import android.app.PendingIntent
 import android.content.BroadcastReceiver
 import android.content.Context
+import android.content.Context.RECEIVER_EXPORTED
+import android.content.Context.RECEIVER_NOT_EXPORTED
 import android.content.Intent
 import android.widget.Toast
 import com.cookandroid.myapplication.AlarmReceiver
@@ -18,7 +21,9 @@ import com.cookandroid.myapplication.databinding.FragmentHomeBinding
 import com.gun0912.tedpermission.PermissionListener
 import com.gun0912.tedpermission.normal.TedPermission
 import android.content.IntentFilter
+import android.os.Build
 import android.util.Log
+import androidx.annotation.RequiresApi
 import com.cookandroid.myapplication.SSHManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -28,9 +33,10 @@ class HomeFragment : Fragment() {
 
     private var _binding: FragmentHomeBinding? = null
     private val binding get() = _binding!!
-    //private var serviceScope: CoroutineScope? = null
+    private var previousIsImageOn: Boolean = false
 
     private val homeViewModel: HomeViewModel by viewModels()
+    @SuppressLint("ScheduleExactAlarm")
     private fun setAlarm() {
         val alarmManager = context?.getSystemService(Context.ALARM_SERVICE) as AlarmManager
         val intent = Intent(context, AlarmReceiver::class.java)
@@ -39,31 +45,6 @@ class HomeFragment : Fragment() {
         val alarmTimeAtUTC = System.currentTimeMillis() + 5 * 1000 // 30초 후
         alarmManager.setExact(AlarmManager.RTC_WAKEUP, alarmTimeAtUTC, pendingIntent)
     }
-
-    /*private fun requestPermission() {
-        TedPermission.create()
-            .setPermissionListener(object : PermissionListener {
-                override fun onPermissionGranted() {
-                    startProcess()
-                }
-
-                override fun onPermissionDenied(deniedPermissions: MutableList<String>?) {
-                    Toast.makeText(this@HomeFragment.requireActivity(), "카메라 기능 실행", Toast.LENGTH_SHORT).show()
-                }
-            })
-            .setDeniedMessage("권한을 허용해주세요.")// 권한이 없을 때 띄워주는 Dialog Message
-            .setPermissions(android.Manifest.permission.SCHEDULE_EXACT_ALARM)// 얻으려는 권한(여러개 가능)
-            .check()
-    }*/
-
-    /* private fun startProcess() {
-        val alarmManager = context?.getSystemService(Context.ALARM_SERVICE) as AlarmManager
-        val intent = Intent(context, AlarmReceiver::class.java)
-        val pendingIntent = PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
-
-        val alarmTimeAtUTC = System.currentTimeMillis() + 1 * 1000 // 30초 후
-        alarmManager.setExact(AlarmManager.RTC_WAKEUP, alarmTimeAtUTC, pendingIntent)
-    }*/
 
     private val updateStateReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
@@ -115,8 +96,11 @@ class HomeFragment : Fragment() {
             // 앱 기능 OFF 시 코드
             binding.imageView.setImageResource(R.drawable.main_icon_off)
             binding.buttonToggle.setImageResource(R.drawable.main_off_button)
-            cancelAlarm() // 알람 취소
+            if (previousIsImageOn) {
+                cancelAlarm() // 알람 취소
+            }
         }
+        previousIsImageOn = isImageOn
     }
 
     private fun cancelAlarm() {
@@ -141,10 +125,11 @@ class HomeFragment : Fragment() {
         Log.d("HomeFragment StopAlarm", intent.action.toString())
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onResume() {
         super.onResume()
 
-        context?.registerReceiver(updateStateReceiver, IntentFilter("com.cookandroid.myapplication.ACTION_UPDATE_STATE"))
+        context?.registerReceiver(updateStateReceiver, IntentFilter("com.cookandroid.myapplication.ACTION_UPDATE_STATE"), RECEIVER_EXPORTED)
         // 상태를 다시 로드하여 UI를 업데이트
         homeViewModel.setImageOnState(homeViewModel.loadImageOnState())
         //Log.d("백그라운드에서 복귀", homeViewModel.loadImageOnState().toString())

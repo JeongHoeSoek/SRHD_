@@ -1,9 +1,11 @@
 package com.cookandroid.myapplication
 
 
+import android.annotation.SuppressLint
 import android.app.*
 import android.content.Context
 import android.content.Intent
+import android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_CONNECTED_DEVICE
 import android.os.*
 import android.util.Log
 import androidx.annotation.RequiresApi
@@ -31,6 +33,7 @@ class MyForegroundService : Service() {
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.Q)
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         Log.d("Foreground Service", "Service started")
         serviceScope?.cancel()  // Cancel existing scope if exists
@@ -42,7 +45,7 @@ class MyForegroundService : Service() {
             .setOngoing(true)
             .build()
 
-        startForeground(NOTI_ID, notification)
+        startForeground(NOTI_ID, notification, FOREGROUND_SERVICE_TYPE_CONNECTED_DEVICE)
 
         runBackground()
 
@@ -81,6 +84,7 @@ class MyForegroundService : Service() {
         sendBroadcast(intent)
     }
 
+    @SuppressLint("ScheduleExactAlarm")
     private fun setAlarm() {
         val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
         val intent = Intent(this, AlarmReceiver::class.java)

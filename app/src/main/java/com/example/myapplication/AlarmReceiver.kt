@@ -20,70 +20,42 @@ import android.widget.Toast
 import com.cookandroid.myapplication.ui.dashboard.DashboardViewModel.DBHelper as MessageDBHelper
 import com.cookandroid.myapplication.ui.phone.PhoneViewModel
 import com.cookandroid.myapplication.ui.dashboard.DashboardViewModel
-import com.cookandroid.myapplication.ui.home.HomeFragment
-//import com.cookandroid.myapplication.ui.phone.PhoneViewModel
 
 class AlarmReceiver : BroadcastReceiver() {
 
-    //private var ringtone: Ringtone? = null
-    //private var vibrator: Vibrator? = null
     companion object {
         private var ringtone: Ringtone? = null
         private var vibrator: Vibrator? = null
         private val handler = Handler(Looper.getMainLooper())
+        private var isManualStop = false
+        private var alarmRunnable: Runnable? = null
     }
+
     override fun onReceive(context: Context, intent: Intent) {
         if (intent.action == "STOP_ALARM") {
-            Log.d("AlarmReceiver stopalarm", intent.action.toString())
+            Log.d("AlarmReceiver", "Alarm manually stopped")
+            isManualStop = true
             stopAlarm(context)
             return
         }
-        // 알람이 울릴 때 실행할 코드
+
         Toast.makeText(context, "알람 울림!", Toast.LENGTH_LONG).show()
-        // 추가적인 작업 수행 (예: 알림 표시)
-        /*val builder = AlertDialog.Builder(context).apply {
-            setTitle("제목을 정하는 건 항상 어려워")
-            setMessage("내용 음슴!")
-            setPositiveButton("넹", DialogInterface.OnClickListener { dialog, which ->
-                Toast.makeText(this.context, "넹!", Toast.LENGTH_SHORT).show()
-            })
-            setNegativeButton("아니용", DialogInterface.OnClickListener { dialog, which ->
-                Toast.makeText(this.context, "아니용!", Toast.LENGTH_SHORT).show()
-            })
-            setNeutralButton("몰?루", DialogInterface.OnClickListener { dialog, which ->
-                Toast.makeText(this.context, "몰?루!", Toast.LENGTH_SHORT).show()
-            })
-            create()
-            show()
-        }*/
         val sharedPref = context.getSharedPreferences("AppSettings", Context.MODE_PRIVATE)
         with(sharedPref.edit()) {
             putBoolean("isAlarmRunning", true)
             apply()
         }
-        // 시간 설정 가져오기
+
         val selectedTime = sharedPref.getString("SelectedTime", "30초")
-        Log.d("AlarmReceiver", "Selected Time: $selectedTime")
-
-        // 세기 설정 가져오기
         val selectedLevel = sharedPref.getString("SelectedLevel", "보통")
-        Log.d("AlarmReceiver", "Selected Level: $selectedLevel")
-
-        // 모드 설정 가져오기
         val selectedMode = sharedPref.getString("SelectedMode", "소리")
-        Log.d("AlarmReceiver", "Selected Mode: $selectedMode")
 
-        // 알람 소리나 진동 설정
         when (selectedMode) {
             "소리" -> playAlarmSound(context, selectedLevel)
             "진동" -> startVibration(context, selectedLevel)
-            else -> {
-                // 기본 행동
-                playAlarmSound(context, selectedLevel)
-            }
+            else -> playAlarmSound(context, selectedLevel)
         }
-        // 일정 시간 후 알람 종료
-        //val handler = Handler(Looper.getMainLooper())
+
         val alarmDuration = when (selectedTime) {
             "10초" -> 10000L
             "30초" -> 30000L
@@ -91,10 +63,14 @@ class AlarmReceiver : BroadcastReceiver() {
             "3분" -> 180000L
             else -> 30000L
         }
-        handler.postDelayed({
-            stopAlarm(context)
-            Log.d("stop alarm", "알람 멈춤")
-        }, alarmDuration)
+
+        alarmRunnable = Runnable {
+            if (!isManualStop) {
+                stopAlarm(context)
+                Log.d("AlarmReceiver", "Alarm stopped automatically")
+            }
+        }
+        handler.postDelayed(alarmRunnable!!, alarmDuration)
     }
 
     private fun playAlarmSound(context: Context, selectedLevel: String?) {
@@ -141,41 +117,33 @@ class AlarmReceiver : BroadcastReceiver() {
     }
 
     private fun stopAlarm(context: Context) {
-        //ringtone?.stop()
-        if (ringtone != null) {
-            if (ringtone!!.isPlaying) {
-                Log.d("AlarmReceiver", "Stopping alarm sound")
-                ringtone!!.stop()
-            } else {
-                Log.d("AlarmReceiver", "Alarm sound is not playing")
-            }
-        } else {
-            Log.d("AlarmReceiver", "Ringtone is null")
+        if (ringtone != null && ringtone!!.isPlaying) {
+            ringtone!!.stop()
         }
         vibrator?.cancel()
-        // 알람 상태 업데이트
+        alarmRunnable?.let { handler.removeCallbacks(it) }
+
         val sharedPref = context.getSharedPreferences("AppSettings", Context.MODE_PRIVATE)
         with(sharedPref.edit()) {
             putBoolean("isAlarmRunning", false)
             apply()
         }
 
-        // SMS 전송
-        sendSMS(context)
+        if (!isManualStop) {
+            sendSMS(context)
+        } else {
+            isManualStop = false
+        }
+
         Log.d("AlarmReceiver", "Alarm stopped")
     }
 
     private fun sendSMS(context: Context) {
         val smsManager = SmsManager.getDefault()
-
-        // 메시지 내용 가져오기
         val message = getMessageFromDatabase(context) ?: return
-
-        // 전화번호 목록 가져오기
         val phoneNumbers = getPhoneNumbersFromDatabase(context) ?: return
 
         Log.d("AlarmReceiver", "sendSMS")
-        // SMS 전송
         phoneNumbers.forEach { phoneNumber ->
             smsManager.sendTextMessage(phoneNumber, null, message, null, null)
             Log.d("AlarmReceiver", "SMS sent to $phoneNumber: $message")
