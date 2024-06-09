@@ -67,7 +67,7 @@ class MyForegroundService : Service() {
                 //sendBroadcast(intent)
                 updateState(true)
                 // 알람을 설정합니다.
-                setAlarm()
+                //setAlarm()
             }
         }
     }
@@ -89,8 +89,9 @@ class MyForegroundService : Service() {
         val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
         val intent = Intent(this, AlarmReceiver::class.java)
         val pendingIntent = PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
-        val alarmTimeAtUTC = System.currentTimeMillis() + 5 * 1000 // 5초 후
-        alarmManager.setExact(AlarmManager.RTC_WAKEUP, alarmTimeAtUTC, pendingIntent)
+        //val alarmTimeAtUTC = System.currentTimeMillis()
+        //alarmManager.setExact(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), pendingIntent)
+        //sendBroadcast(intent)
     }
 
     private fun runBackground() {

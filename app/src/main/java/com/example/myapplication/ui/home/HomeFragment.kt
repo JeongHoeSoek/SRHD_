@@ -42,8 +42,10 @@ class HomeFragment : Fragment() {
         val intent = Intent(context, AlarmReceiver::class.java)
         val pendingIntent = PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
 
-        val alarmTimeAtUTC = System.currentTimeMillis() + 5 * 1000 // 30초 후
-        alarmManager.setExact(AlarmManager.RTC_WAKEUP, alarmTimeAtUTC, pendingIntent)
+        //val alarmTimeAtUTC = System.currentTimeMillis()
+        //alarmManager.setExact(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), pendingIntent)
+        context?.sendBroadcast(intent)
+        Log.d("HomeFragment", "setAlarm ready")
     }
 
     private val updateStateReceiver = object : BroadcastReceiver() {

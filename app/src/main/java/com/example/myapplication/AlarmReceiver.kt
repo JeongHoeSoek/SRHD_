@@ -32,6 +32,7 @@ class AlarmReceiver : BroadcastReceiver() {
     }
 
     override fun onReceive(context: Context, intent: Intent) {
+        Log.d("AlarmReceiver", "Alarm Receiver Ready")
         if (intent.action == "STOP_ALARM") {
             Log.d("AlarmReceiver", "Alarm manually stopped")
             isManualStop = true
